@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    // File Layout
+    // "rootDir": "./src",
+    "outDir": "./dist/src",
+    // Environment Settings
+    // "module": "nodenext",
+    "module": "NodeNext",
+    "target": "esnext",
+    "types": [
+      "vitest/globals",
+      "node",
+      "uuid"
+    ],
+    // "typeRoots": ["./node_modules/@types", "./src/types"],
+    // "esModuleInterop": true,
+    "sourceMap": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": false,
+    "isolatedModules": false,
+    "noUncheckedSideEffectImports": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*",
+    "src/types/**/*"
+  ],
+  "files": [
+    "src/types/express/index.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

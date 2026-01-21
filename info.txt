@@ -1,0 +1,92 @@
+
+Run Commands:
+
+<--- Installation Steps -->
+npm install // for installing all dependencies.
+npx prisma generate // run this cmd after npm install.
+npx prisma db push // run this cmd for pushing schema changes without migration.
+npx prisma db seed // run this command for seeded data. 
+npm run dev // for running the server.
+
+<--- " Additional Commands " --->
+npx prisma format // run this cmd for formatting prisma schema.
+npm run merge:prisma // for new or add any model changes run this.
+npx prisma migrate reset // drop your db. 
+npm run test (or)  npx vitest run // run your test cases.
+npx prisma studio // run this cmd for browser db. 
+
+// Password:
+            
+Admin:
+username:admin@example.com,
+Password:Admin@123
+
+Staff:
+username:staff@example.com,
+Password:Staff@123
+
+// Role Info:
+1 Admin
+2 Staff
+3 Coach
+4 Client
+
+// Staff Status:
+Status : 0-Inactive, 1-Active, 2- Delete
+
+// Coach:
+Status : 0-Inactive, 1-Active, 2- Delete
+is_approved : 0 - Pending, 1-Approved, 2-Deleted
+Run Commands:
+
+npm install // for installing all dependencies.
+npx prisma format // run this cmd for formatting prisma schema.
+npx prisma generate // run this cmd after npm install.
+npm run merge:prisma // for new or add any model changes run this.
+npx prisma migrate reset // drop your db. 
+npm run dev // for running the server.
+npm run test (or)  npx vitest run // run your test cases.
+npx prisma studio // run this cmd for browser db. 
+npx prisma db push // run this cmd for pushing schema changes without migration.
+npx prisma db seed // run this command for seeded data. 
+
+// Password:
+            
+Admin:
+username:admin@example.com,
+Password:Admin@123
+
+Staff:
+username:staff@example.com,
+Password:Staff@123
+
+// Role Info:
+1 Admin
+2 Staff
+3 Coach
+4 Client
+
+// Staff Status:
+Status : 0-Inactive, 1-Active, 2- Delete
+
+// Coach:
+Status : 0-Inactive, 1-Active, 2- Delete
+is_approved : 0 - Pending, 1-Approved, 2-Deleted
+coaching_hours:  0- 0-100 hrs, 1-100-500 hrs, 2-500-1000, 3-1000 hrs
+is_static : 0 - not assign, 1 - Assign static site
+
+// Subscription plan
+Currency : 0 - INR , 1-USD
+Status : 0-Inactive, 1-Active, 2- Delete
+
+// Payment
+is_paid: 0 - pending, 1 - paid
+status: 0 -pending, 1-success, 2- failed
+
+// Feedback
+Status : 0-Inactive, 1-Active, 2-Delete
+
+
+//Dyte login
+email : dyte_dev@yopmail.com
+pass : dyte_dev@alefitt1
