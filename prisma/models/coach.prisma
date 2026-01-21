@@ -1,0 +1,55 @@
+model Coach {
+  id                     String    @id @default(uuid())
+  user_id                String    @unique
+  full_name              String
+  email                  String    @unique
+  mobile                 String
+  linked_url             String
+
+  image_url              String?
+  upload_file_url        String?
+
+  website                String
+  timezone               String
+
+  coaching_credentials   String[]
+  coaching_hours         Int
+  coaching_experience    String
+  industries             String[]
+  leadership_levels      String[]
+  coaching_topics        String
+  coaching_style         String[]
+  coaching_philosophy    String
+  coaching_strength      String
+  preferred_client       String
+  clients_situation      String[]
+  coaching_boundaries    String
+  session_rates          String[]
+
+  status                 Int
+  is_approved            Int
+
+  approved_by            String?
+  approved_by_staff      String?
+  approved_at            DateTime?
+  rejection_reason       String?
+
+  current_payment_method_id   String?
+  current_subscription_id     String?
+  current_subscription_type_id String?
+  stripe_customer_id          String?
+  stripe_payment_intent_id    String?
+  payment_method_type         String?
+
+  rating_average         Float?
+  total_sessions         Int?
+  total_reviews          Int?
+  rating                 Float?
+
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+
+  subscriptions          CoachSubscription[]
+  feedbacks              Feedback[]
+}
+

@@ -1,0 +1,126 @@
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        #card-element {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Complete Your Payment</h2>
+
+    <div id="card-element"></div>
+    <button id="payBtn">Pay</button>
+    <div id="error" style="color:red;"></div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientSecret = urlParams.get("cs");
+
+        // replace with your publishable key
+        const stripe = Stripe("pk_test_51SQkIRK94KL28SvcTlkZPzKvJtijlfmzxgS4jj9aOmoPp8QGQO16oxHI8G0QdFCoWNf9U0x88I7RhwlRxpiU5zNe00XY0Bp7SV");
+
+        const elements = stripe.elements();
+        const card = elements.create("card");
+        card.mount("#card-element");
+
+        document.getElementById("payBtn").addEventListener("click", async () => {
+            const result = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: { card: card }
+            });
+
+            if (result.error) {
+                document.getElementById("error").textContent = result.error.message;
+            } else {
+                if (result.paymentIntent.status === "succeeded") {
+                    alert("Payment successful!");
+                }
+            }
+        });
+    </script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        #card-element {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Complete Your Payment</h2>
+
+    <div id="card-element"></div>
+    <button id="payBtn">Pay</button>
+    <div id="error" style="color:red;"></div>
+
+    <script>
+        // Your Stripe publishable key
+        const stripe = Stripe("pk_test_51SQkIRK94KL28SvcTlkZPzKvJtijlfmzxgS4jj9aOmoPp8QGQO16oxHI8G0QdFCoWNf9U0x88I7RhwlRxpiU5zNe00XY0Bp7SV");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentIntentId = urlParams.get("pi");
+
+        let clientSecret = null;
+
+        //  Fetch fresh client_secret from backend
+        async function fetchLatestClientSecret() {
+            const res = await fetch("http://localhost:5000/coach/get_client_secret", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ payment_intent_id: paymentIntentId }),
+            });
+
+            const data = await res.json();
+            clientSecret = data.clientSecret; // Always fresh
+        }
+
+        // Initialize Stripe Elements
+        async function init() {
+            await fetchLatestClientSecret();
+
+            const elements = stripe.elements();
+
+            const card = elements.create("card");
+            card.mount("#card-element");
+
+            document.getElementById("payBtn").addEventListener("click", async () => {
+
+                // 3️⃣ Confirm payment using *fresh* client_secret
+                const result = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: { card: card }
+                });
+
+                if (result.error) {
+                    document.getElementById("error").textContent = result.error.message;
+                } else {
+                    if (result.paymentIntent.status === "succeeded") {
+                        alert("Payment successful!");
+                        window.location.href = "/success";
+                    }
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
