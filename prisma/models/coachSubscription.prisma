@@ -1,0 +1,23 @@
+model CoachSubscription {
+  id                   String      @id @default(uuid())
+  coach_id             String
+  subscription_plan_id String
+  stripe_customer_id   String
+
+  status               Int
+  current_period_start DateTime
+  current_period_end   DateTime
+
+  amount               Decimal      @db.Decimal(10, 2)
+  currency             String       @default("usd")
+
+  discount_applied     Decimal?     @db.Decimal(10, 2)
+  final_price          Decimal      @db.Decimal(10, 2)
+
+  created_at           DateTime     @default(now())
+  updated_at           DateTime     @updatedAt
+
+  // RELATIONS
+  coach                 Coach             @relation(fields: [coach_id], references: [id])
+  subscription_plan     SubscriptionPlan  @relation(fields: [subscription_plan_id], references: [id])
+}

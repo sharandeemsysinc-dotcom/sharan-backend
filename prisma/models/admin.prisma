@@ -1,0 +1,17 @@
+model Admin {
+  id           String   @id @default(uuid())
+  user_id      String   @unique
+  user         User     @relation(fields: [user_id], references: [id])
+  first_name   String?
+  middle_name  String?
+  last_name    String?
+  country_code String?
+  email        String?  @unique
+  mobile       String?
+  image_url    String?
+  access_level String   @default("full")
+  status       Int      @default(1)
+  created_by   String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime? @updatedAt
+}

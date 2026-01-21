@@ -1,0 +1,13 @@
+model SubscriptionPlan {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(100)
+  description String?
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    Int?
+  status      Int?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  subscriptions CoachSubscription[]
+
+}

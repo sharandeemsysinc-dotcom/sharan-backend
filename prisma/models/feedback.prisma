@@ -1,0 +1,17 @@
+model Feedback {
+  id             String     @id @default(uuid())
+  appointment_id String
+  coach_id       String
+  client_id      String
+
+  reason         String?
+  rating         Int
+  status         Int 
+
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  appointment    Appointment @relation(fields: [appointment_id], references: [id])
+  coach          Coach       @relation(fields: [coach_id], references: [id])
+  client         Client      @relation(fields: [client_id], references: [id])
+}
