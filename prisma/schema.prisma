@@ -1,0 +1,480 @@
+datasource db {
+  provider = "postgresql" // or mysql/sqlite
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  user_id      String   @unique
+  user         User     @relation(fields: [user_id], references: [id])
+  first_name   String?
+  middle_name  String?
+  last_name    String?
+  country_code String?
+  email        String?  @unique
+  mobile       String?
+  image_url    String?
+  access_level String   @default("full")
+  status       Int      @default(1)
+  created_by   String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime? @updatedAt
+}
+
+model Feedback {
+  id                                      String   @id @default(uuid())
+  appointment_id                          String
+  coach_id                                String
+  client_id                               String
+  rating                                  Int?
+  status                                  Int      @default(1)
+  coach_Comfort_Level                     Int?
+  coach_Understanding                     Int?
+  style_and_Approach                      Int?
+  felt_Supported                          Int?
+  like_to_proceed                         Int?
+  positive_or_negative_about_conversation String?
+  move_Forward_Decision_Question          String?
+  overall_experience                      Int?
+  effectiveness                           Int?
+  style_fit_over_time                     Int?
+  coach_feedback                          String?
+  is_first_appointment                    Boolean  @default(false)
+  created_at                              DateTime @default(now())
+  updated_at                              DateTime @updatedAt
+
+  appointment                             Appointment @relation(fields: [appointment_id], references: [id])
+  coach                                   Coach       @relation(fields: [coach_id], references: [id])
+  client                                  Client      @relation(fields: [client_id], references: [id])
+}
+
+
+model Appointment {
+  id                  String    @id @default(uuid())
+  series_id           String?
+  coach_id            String
+  client_id           String
+  start_date          DateTime  @db.Date
+  end_date            DateTime  @db.Date
+  scheduled_start     DateTime
+  scheduled_end       DateTime
+  duration_minutes    Int
+  timezone            String    @db.VarChar(64)
+  status              Int       @default(1) // 1=Scheduled, 2=Completed, 3=Cancelled, 5=Pending
+  is_reschedule       Int       @default(0)
+  meeting_link        String?   @db.Text
+  meeting_provider    String?   @db.VarChar(64)
+  meeting_password    String?   @db.VarChar(100)
+  meeting_type        String?   @db.VarChar(32) // 'single', 'recurring'
+  dyte_meeting_id     String?   @db.VarChar(100)
+  dyte_room_name      String?   @db.VarChar(100)
+  
+  // --- Recurring Pattern Keys (Non-mandatory) ---
+  no_of_sessions          Int?
+  repeat_unit             Int?      // Enum: 1-Day, 2-Weekly, 3-Bi_Weekly, 4-Month, 5-Year
+  repeat_interval         String?   // e.g., "1"
+  recurrence_days         Json?     // Array of days [0,1,2...]
+  recurrence_start_date   DateTime?   // ISO Date String or Date
+  recurrence_end_date     DateTime? 
+  recurrence_pattern_type String?   @db.VarChar(32) // "fixed" or "relative"
+  fixed_day_of_month      String?   @db.VarChar(10) // e.g., "4"
+  relative_week_index     String?   @db.VarChar(10) // e.g., "1" (First), "5" (Last)
+  relative_day_of_week    String?   @db.VarChar(10) // e.g., "3" (Wednesday)
+  all_day                 Boolean?  @default(false)
+
+  payment_status      String?   @db.VarChar(32)
+  payment_id          String?
+  price               Decimal?  @db.Decimal(10, 2)
+  currency            String?   @db.VarChar(8)
+  cancelled_by        String?
+  cancel_reason       String?   @db.Text
+  cancelled_at        DateTime?
+  coach_notes         String?   @db.Text
+  client_notes        String?   @db.Text
+  coach_rating        Decimal?
+  reminder_sent_at    DateTime?
+  is_first_meeting    Boolean?
+  is_overlapped       Boolean?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  coach               Coach     @relation(fields: [coach_id], references: [id])
+  client              Client    @relation(fields: [client_id], references: [id])
+  canceller           User?     @relation("AppointmentCancelledBy", fields: [cancelled_by], references: [id])
+  feedbacks           Feedback[]
+}
+ 
+model Client {
+  id           String   @id @default(uuid())
+  user_id      String   @unique
+  first_name   String
+  last_name    String?
+  middle_name  String?
+  email        String   @unique
+  country_code    String?
+  mobile       String?
+  profile_image String?
+  city         String?
+  total_sessions Int    @default(0)
+  status       Int      @default(1)  // 0=Inactive, 1=Active, 2=Deleted
+  notes        String?  @db.Text
+  linked_in_url String?
+  website_url  String?
+  terms_conditions Boolean?
+
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  
+  client_history ClientHistory[] @relation("ClientToHistory")
+  feedbacks      Feedback[]
+  appointments   Appointment[]
+  paymentHistories clientPaymentHistory[]
+}
+
+
+model ClientHistory {
+  id                         String   @id @default(uuid())
+  client_id                  String   @unique
+  current_role               String?
+  support_seek               String?
+  coaching_goals             Json?
+  other_coaching_goals       String?
+  coaching_time              String?
+  coaching_style             Json?
+  other_coaching_style       String?
+  not_working_coach_style    String?
+  leadership_levels          Json?
+  other_leadership_levels    String?
+  coach_experience_in_industry Int?   // (0 | 1 | 2)
+  industries                 Json?
+  other_industries           String?
+  is_worked_with_coach       Int?     // 0, 1
+  work_reason                String?
+  coach_reason               String?
+  coach_area                 Json?
+  other_area                 String?
+  working_style              Int?     // 0, 1, 2, 3
+  motivation_history         Int?     // 0, 1, 2, 3
+  coach_comments             String?
+  time_zone                  String?
+  other_time_zone            String?
+  notes                      String?
+  engagement_type            Int?     // 0, 1, 2
+  other_engagement_type      String?
+  ref_source                 String?
+  coach_experience           String?  // 0, 1, 2, 3
+  coach_cred_preference      Int?     // 0, 1
+  coaching_credentials       Json?
+  other_coaching_credentials String?
+  
+  // File Upload Fields
+  acc_upload_file            String?
+  pcc_upload_file            String?
+  mcc_upload_file            String?
+  emcc_upload_file           String?
+  cpcc_upload_file           String?
+  other_upload_file          String?
+
+  range_per_session          Json?
+  created_at                 DateTime @default(now())
+  updated_at                 DateTime @updatedAt
+
+  client                     Client   @relation("ClientToHistory", fields: [client_id], references: [id])
+}
+
+
+model Coach {
+  id         String @id @default(uuid())
+  user_id    String @unique
+  first_name  String
+  middle_name  String?
+  last_name  String?
+
+  email      String @unique
+  mobile     String?
+  linked_url String?
+  country_code    String?
+  terms_conditions Boolean?
+
+  image_url       String?
+  upload_file_url String?
+  website  String?
+  timezone String?
+
+  coaching_credentials Json?
+  other_coaching_credentials String?
+
+  acc_upload_file      String?
+  pcc_upload_file      String?
+  mcc_upload_file      String?
+  emcc_upload_file     String?
+  co_active_upload_file  String?
+  other_upload_file    String?
+
+  coaching_hours       Int?
+  coaching_experience  String?
+  
+  industries           Json?
+  other_industries     String?
+  leadership_levels    Json?
+  coaching_topics      String? 
+  coaching_style       Json?
+  other_coaching_style  String?
+  coaching_philosophy  String?
+  coaching_strength    String?
+  preferred_client     String?
+  clients_situation    Json?
+  other_clients_situation  String?
+  coaching_boundaries  String?
+
+  session_rates        Json?
+  connecting_coaches  Int?
+  connecting_other_coaches  String?
+  anything     String?
+  bio          String?
+
+  is_static Int @default(0)
+  comments    String?
+  
+  status      Int @default(1)
+  is_approved Int
+  approved_by       String?
+  approved_by_staff String?
+  approved_at       DateTime?
+  rejection_reason  String?
+
+  current_payment_method_id    String?
+  current_subscription_id      String?
+  current_subscription_type_id String?
+  stripe_customer_id           String?
+  stripe_payment_intent_id     String?
+  payment_method_type          String?
+  card_brand                   String?
+  card_last4                   String?
+
+  rating_average Float?
+  total_sessions Int?
+  total_reviews  Int?
+  rating         Float?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  subscriptions CoachSubscription[]
+  feedbacks     Feedback[]
+  appointments  Appointment[]
+  paymentHistories clientPaymentHistory[]
+}
+
+
+model CoachRequest {
+  id               String   @id @default(uuid())
+  client_id        String
+  user_id          String
+  email            String
+  name             String
+  phone            String
+  reason           String?
+  coaches          Json
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now())
+}
+
+model CoachSubscription {
+  id                   String      @id @default(uuid())
+  coach_id             String
+  subscription_id     String
+  subscription_type_id String
+  stripe_customer_id   String
+ 
+  status               Int
+  current_period_start DateTime
+  current_period_end   DateTime
+ 
+  amount               Decimal      @db.Decimal(10, 2)
+  currency             String       @default("usd")
+ 
+  discount_applied     Decimal?     @db.Decimal(10, 2)
+  final_price          Decimal      @db.Decimal(10, 2)
+ 
+  created_at           DateTime     @default(now())
+  updated_at           DateTime     @updatedAt
+ 
+  // RELATIONS
+  coach                 Coach             @relation(fields: [coach_id], references: [id])
+  subscription_plan     SubscriptionPlan  @relation(fields: [subscription_id], references: [id])
+}
+
+
+model Payments {
+  id String @id @default(uuid())
+  coach_id                String // FIXED (was Int)
+  related_subscription_id String? // FIXED (was Int?)
+  related_subscription_type_id  String?
+  plan_type                Int?
+  payment_type             String
+  stripe_customer_id       String?
+  stripe_payment_intent_id String?
+  stripe_charge_id         String?
+  amount                   Float
+  currency                 String
+  is_paid                  Int
+  status                   Int
+  failure_reason           String?
+  payment_method           String?
+  card_brand               String?
+  card_last4               String?
+  card_exp_month           String?
+  card_exp_year            String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+}
+
+
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  created_at DateTime @default(now())
+  users      User[]
+}
+
+model Staff {
+  id      String @id @default(uuid())
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [id])
+  first_name  String?
+  middle_name  String?
+  last_name  String?
+  country_code    String?
+  email      String
+  mobile     String
+  image_url  String?
+  status     Int      @default(1)
+  created_by String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt()
+}
+
+
+
+model SubscriptionPlan {
+  id          String   @id @default(uuid())
+  plan_name   String
+  plan_type   Json
+  status      Int      @default(1)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+ 
+  coachSubscriptions CoachSubscription[]
+}
+
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password_hash     String?
+  user_name         String
+  phone             String?
+  is_active         Boolean   @default(true)
+  is_email_verified Boolean   @default(false)
+  last_login_at     DateTime?
+  refresh_token     String?
+  role_id           Int?
+  status            Int?
+  role              Role?     @relation(fields: [role_id], references: [id])
+  // OTP fields
+  otp_code_hash    String?
+  otp_attempts     Int       @default(0)
+  otp_expires_at   DateTime?
+  otp_requested_at DateTime?
+  
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now())
+  admin            Admin?
+  staff            Staff?
+  cancelled_appointments Appointment[] @relation("AppointmentCancelledBy")
+}
+
+model CoachesClientMapping {
+  id                     String   @id @default(uuid())
+  client_id              String
+  assigned_by_admin_id   String?
+  assigned_by_staff_id   String?
+  assigned_coach_ids     Json       // array of coach IDs
+  primary_coach_id       String
+  client_history_id      String?
+  reason                 String?
+
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+
+}
+
+model WorkingHours {
+  id                    String   @id @default(uuid()) @map("_id")
+  coachId               String
+  isDeleted             Int      @default(0) // 0 - active, 1 - inactive, 2 - deleted
+  workingHours_of_Coach Json
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+}
+
+model Holiday {
+  id          String         @id @default(cuid())
+  coachId     String
+  holidayDate DateTime
+  reason      String
+  isDeleted   Int      @default(0) // 0 - active, 1 - deleted
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model Discount {
+  id                          String   @id @default(uuid())
+  coach_id                    String?
+  reference_type              String?   // Trials, Initial , Renew
+  trial_months                Int?      // Monthly trial duration
+  trial_months_annual         Int?      // Annual trial duration
+
+  discount_percentage         Int?    // Monthly discount %
+  discount_percentage_annual  Int?    // Annual discount %
+
+  months                      Int?      // Monthly subscription duration
+  months_annual               Int?      // Annual subscription duration
+
+  created_at                  DateTime  @default(now())
+  updated_at                  DateTime  @updatedAt
+}
+
+
+model clientPaymentHistory {
+  id          String         @id @default(cuid())
+  coach_id     String?
+  appointment_id  String?
+  client_id   String?
+  map_id      String?
+  appointment_start_date DateTime?
+  appointment_end_date   DateTime?
+  payment_Date   DateTime?
+  amount      String?
+  is_paid     Int?
+  currency    String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  coach   Coach?   @relation(fields: [coach_id], references: [id])
+  client  Client?  @relation(fields: [client_id], references: [id])
+
+}
+
+model Settings {
+  id                          String   @id @default(uuid())
+  first_meeting_duration      String?
+  created_at                  DateTime  @default(now())
+  updated_at                  DateTime  @updatedAt
+}

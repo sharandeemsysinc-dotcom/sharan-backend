@@ -1,0 +1,11 @@
+model Client {
+  id        String   @id @default(uuid())
+  user_id   String   @unique
+  email     String    @unique
+  name      String
+  mobile    String
+  status    Int      @default(1)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

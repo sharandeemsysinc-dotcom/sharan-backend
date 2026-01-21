@@ -1,0 +1,25 @@
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  password_hash    String?
+  user_name        String
+  phone            String?
+  is_active        Boolean  @default(true)
+  is_email_verified Boolean @default(false)
+  last_login_at    DateTime?
+  refresh_token    String?
+  role_id          Int?
+  status           Int?
+  role             Role?    @relation(fields: [role_id], references: [id])
+  
+  // OTP fields
+  otp_code_hash    String?
+  otp_attempts     Int      @default(0)
+  otp_expires_at   DateTime?
+  otp_requested_at DateTime?
+  
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now())
+  admin            Admin?
+  staff            Staff?
+}

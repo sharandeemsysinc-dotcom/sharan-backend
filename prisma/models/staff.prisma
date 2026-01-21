@@ -1,0 +1,15 @@
+model Staff {
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  user       User     @relation(fields: [user_id], references: [id])
+
+  name       String
+  email      String
+  mobile     String
+  image_url   String?
+  status     Int@default(1)
+  created_by String?
+  created_at DateTime @default(now())
+  updated_at  DateTime @updatedAt()
+}
+

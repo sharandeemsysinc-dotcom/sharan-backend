@@ -1,0 +1,21 @@
+model Payments {
+  id                       String    @id @default(uuid())
+
+  coach_id                 String                       // FIXED (was Int)
+  related_subscription_id  String?                      // FIXED (was Int?)
+
+  payment_type             String
+  stripe_customer_id       String?
+  stripe_payment_intent_id String?
+  stripe_charge_id         String?
+  amount                   Float
+  currency                 String
+  is_paid                  Int
+  status                   Int
+  failure_reason           String?
+  payment_method           String?
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+
+}
+

@@ -1,0 +1,11 @@
+model CoachRequest {
+  id               String   @id @default(uuid())
+  client_id        String
+  user_id          String
+  email            String
+  name             String
+  phone            String
+  reason           String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now())
+}
